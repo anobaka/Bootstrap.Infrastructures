@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bootstrap.Infrastructures.Extensions\Bootstrap.Infrastructures.Extensions.csproj" />
+    <ProjectReference Include="..\Bootstrap.Infrastructures.Models\Bootstrap.Infrastructures.Models.csproj" />
+  </ItemGroup>
+
+</Project>
