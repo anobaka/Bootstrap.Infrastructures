@@ -14,7 +14,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Bootstrap.Infrastructures.Components.Middleware
 {
-    public class RestfulApiSimpleExceptionHandlingMiddleware
+    public class SimpleRestfulApiExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
@@ -22,12 +22,12 @@ namespace Bootstrap.Infrastructures.Components.Middleware
         private readonly JsonSerializerSettings _jsonSerializerSettings =
             new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()};
 
-        private readonly EventId _eventId = new EventId(0, nameof(RestfulApiSimpleExceptionHandlingMiddleware));
+        private readonly EventId _eventId = new EventId(0, nameof(SimpleRestfulApiExceptionHandlingMiddleware));
 
-        public RestfulApiSimpleExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public SimpleRestfulApiExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             _next = next;
-            _logger = loggerFactory.CreateLogger<RestfulApiSimpleExceptionHandlingMiddleware>();
+            _logger = loggerFactory.CreateLogger<SimpleRestfulApiExceptionHandlingMiddleware>();
         }
 
         public async Task Invoke(HttpContext context)
@@ -76,7 +76,7 @@ namespace Bootstrap.Infrastructures.Components.Middleware
     {
         public static IApplicationBuilder UseRestfulApiSimpleExceptionHandler(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<RestfulApiSimpleExceptionHandlingMiddleware>();
+            return app.UseMiddleware<SimpleRestfulApiExceptionHandlingMiddleware>();
         }
     }
 }

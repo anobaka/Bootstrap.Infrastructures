@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Bootstrap.Infrastructures.Extensions;
-using Bootstrap.Infrastructures.Models.Constants;
 using Bootstrap.Infrastructures.Models.ResponseModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -18,14 +17,13 @@ namespace Bootstrap.Infrastructures.Components.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
         private readonly EventId _eventId = new EventId(0, nameof(SimpleExceptionHandlingMiddleware));
-        private readonly string _ajaxResponse;
+        protected readonly string AjaxResponse;
 
         public SimpleExceptionHandlingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             _next = next;
             _logger = loggerFactory.CreateLogger<SimpleExceptionHandlingMiddleware>();
-            _ajaxResponse = JsonConvert.SerializeObject(new BaseResponse((int)ResponseCode.InternalError,
-                    ResponseCode.InternalError.ToString()),
+            AjaxResponse = JsonConvert.SerializeObject(new BaseResponse(500, "Internal Server Error"),
                 new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()});
         }
 
@@ -48,7 +46,7 @@ namespace Bootstrap.Infrastructures.Components.Middleware
                     //Default behavior
                     if (context.Request.AcceptJson())
                     {
-                        await context.Response.WriteAsync(_ajaxResponse, Encoding.UTF8);
+                        await context.Response.WriteAsync(AjaxResponse, Encoding.UTF8);
                     }
                     else
                     {
@@ -58,6 +56,7 @@ namespace Bootstrap.Infrastructures.Components.Middleware
             }
         }
     }
+
     public static class ExceptionHandlingMiddlewareServiceCollectionExtensions
     {
         public static IApplicationBuilder UseSimpleExceptionHandler(this IApplicationBuilder app)
