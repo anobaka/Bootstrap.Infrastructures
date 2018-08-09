@@ -1,23 +1,23 @@
 ﻿namespace Bootstrap.Infrastructures.Models.ResponseModels
 {
-    public class SingleResponse<T> : BaseResponse
+    public class SingletonResponse<T> : BaseResponse
     {
         public T Data { get; set; }
 
-        public SingleResponse()
+        public SingletonResponse()
         {
         }
 
-        public SingleResponse(T data)
+        public SingletonResponse(T data)
         {
             Data = data;
         }
 
-        public SingleResponse(int code) : base(code)
+        public SingletonResponse(int code) : base(code)
         {
         }
 
-        public SingleResponse(int code, string message) : base(code, message)
+        public SingletonResponse(int code, string message) : base(code, message)
         {
         }
     }

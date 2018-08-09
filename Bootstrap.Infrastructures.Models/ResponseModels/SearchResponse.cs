@@ -2,7 +2,7 @@
 
 namespace Bootstrap.Infrastructures.Models.ResponseModels
 {
-    public class SearchResponse<T> : SingleResponse<IEnumerable<T>>
+    public class SearchResponse<T> : ListResponse<T>
     {
         public int TotalCount { get; set; }
         public int PageIndex { get; set; }

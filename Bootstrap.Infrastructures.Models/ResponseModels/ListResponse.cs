@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Bootstrap.Infrastructures.Models.ResponseModels
 {
-    public class ListResponse<T> : SingleResponse<List<T>>
+    public class ListResponse<T> : SingletonResponse<List<T>>
     {
     }
 }
