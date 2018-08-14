@@ -1,4 +1,6 @@
-﻿namespace Bootstrap.Infrastructures.Models.ResponseModels
+﻿using System.Runtime.InteropServices.ComTypes;
+
+namespace Bootstrap.Infrastructures.Models.ResponseModels
 {
     public class BaseResponse
     {

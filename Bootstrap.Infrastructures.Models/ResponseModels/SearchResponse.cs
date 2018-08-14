@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Bootstrap.Infrastructures.Models.ResponseModels
+﻿namespace Bootstrap.Infrastructures.Models.ResponseModels
 {
     public class SearchResponse<T> : ListResponse<T>
     {
