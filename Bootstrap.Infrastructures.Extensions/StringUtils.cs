@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,6 +14,25 @@ namespace Bootstrap.Infrastructures.Extensions
         {
             return Random.Next(Convert.ToInt32(Math.Pow(10, length))).ToString($"D{length}");
         }
+
+        public static string GenerateOrderNo(string prefix = null)
+        {
+            return GenerateOrderNoList(1).FirstOrDefault();
+        }
+
+        public static string[] GenerateOrderNoList(int count, string prefix = null)
+        {
+            prefix = $"{prefix}{DateTime.Now:yyyyMMddHHmmssfff}";
+            var suffixInt = GetRandomNumber(9);
+            var result = new string[count];
+            for (var i = 0; i < count; i++)
+            {
+                result[i] = prefix + (suffixInt + i % 10E9);
+            }
+
+            return result;
+        }
+
         public static bool IsPublicIpV4(string ip)
         {
             return Regex.IsMatch(ip,
