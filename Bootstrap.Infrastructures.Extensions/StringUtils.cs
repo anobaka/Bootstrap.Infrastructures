@@ -23,7 +23,7 @@ namespace Bootstrap.Infrastructures.Extensions
         public static string[] GenerateOrderNoList(int count, string prefix = null)
         {
             prefix = $"{prefix}{DateTime.Now:yyyyMMddHHmmssfff}";
-            var suffixInt = GetRandomNumber(9);
+            var suffixInt = GetRandomNumber(6);
             var result = new string[count];
             for (var i = 0; i < count; i++)
             {
