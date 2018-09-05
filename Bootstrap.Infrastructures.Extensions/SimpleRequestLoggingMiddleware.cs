@@ -63,8 +63,9 @@ namespace Bootstrap.Infrastructures.Extensions
                     }
 
                     var authentication = await context.AuthenticateAsync();
+                    // may be null
                     var principal = authentication.Principal;
-                    var isAuthenticated = principal.Identity.IsAuthenticated;
+                    var isAuthenticated = principal?.Identity.IsAuthenticated == true;
                     var lines = new List<string>
                     {
                         BuildDelimiter("request"),
@@ -75,8 +76,8 @@ namespace Bootstrap.Infrastructures.Extensions
                         $"body: {reqString}",
                         BuildDelimiter("session"),
                         $"authenticated: {isAuthenticated}",
-                        $"name: {principal.Identity.Name}",
-                        $"claims: {{{string.Join(", ", principal.Claims.Select(t => $"{t.Type}: {t.Value}"))}}}",
+                        $"name: {principal?.Identity.Name}",
+                        $"claims: {(principal != null ? $"{{{string.Join(", ", principal.Claims.Select(t => $"{t.Type}: {t.Value}"))}}}" : null)}",
                         BuildDelimiter("response"),
                         $"status: {context.Response.StatusCode}",
                         $"headers: \n{string.Join('\n', context.Response.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
