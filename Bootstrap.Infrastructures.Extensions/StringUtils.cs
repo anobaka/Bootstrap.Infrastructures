@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Bootstrap.Infrastructures.Extensions
 {
-    public class StringUtils
+    public static class StringUtils
     {
         private static readonly Random Random = new Random();
 
@@ -43,6 +43,48 @@ namespace Bootstrap.Infrastructures.Extensions
         {
             return Regex.IsMatch(ip,
                 @"(^127\.)|(^10\.) |(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)|(^::1)");
+        }
+
+        public static int GetLevenshteinDistance(this string a, string b)
+        {
+            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
+            {
+                return a?.Length ?? b?.Length ?? 0;
+            }
+
+            a = a.ToLower();
+            b = b.ToLower();
+
+            if (a.Equals(b))
+            {
+                return 0;
+            }
+
+            var d = new int[a.Length + 1, b.Length + 1];
+
+            for (var i = 0; i <= d.GetUpperBound(0); i += 1)
+            {
+                d[i, 0] = i;
+            }
+
+            for (var i = 0; i <= d.GetUpperBound(1); i += 1)
+            {
+                d[0, i] = i;
+            }
+
+            for (var i = 1; i <= d.GetUpperBound(0); i += 1)
+            {
+                for (var j = 1; j <= d.GetUpperBound(1); j += 1)
+                {
+                    var cost = Convert.ToInt32(a[i - 1] != b[j - 1]);
+
+                    var min1 = d[i - 1, j] + 1;
+                    var min2 = d[i, j - 1] + 1;
+                    var min3 = d[i - 1, j - 1] + cost;
+                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
+                }
+            }
+            return d[d.GetUpperBound(0), d.GetUpperBound(1)];
         }
     }
 }
