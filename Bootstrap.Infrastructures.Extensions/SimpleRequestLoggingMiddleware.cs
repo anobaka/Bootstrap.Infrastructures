@@ -72,7 +72,7 @@ namespace Bootstrap.Infrastructures.Extensions
                         $"url: {context.Request.GetDisplayUrl()}",
                         $"remote address: {context.Connection.RemoteIpAddress}:{context.Connection.RemotePort}",
                         $"method: {context.Request.Method}",
-                        $"headers: \n{string.Join('\n', context.Request.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
+                        $"headers: \n{string.Join("\n", context.Request.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
                         $"body: {reqString}",
                         BuildDelimiter("session"),
                         $"authenticated: {isAuthenticated}",
@@ -80,10 +80,10 @@ namespace Bootstrap.Infrastructures.Extensions
                         $"claims: {(principal != null ? $"{{{string.Join(", ", principal.Claims.Select(t => $"{t.Type}: {t.Value}"))}}}" : null)}",
                         BuildDelimiter("response"),
                         $"status: {context.Response.StatusCode}",
-                        $"headers: \n{string.Join('\n', context.Response.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
+                        $"headers: \n{string.Join("\n", context.Response.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
                         $"body: {resString}"
                     };
-                    _logger.LogInformation(_eventId, $"\n{string.Join('\n', lines)}");
+                    _logger.LogInformation(_eventId, $"\n{string.Join("\n", lines)}");
                 }
             }
         }
