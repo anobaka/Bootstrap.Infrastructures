@@ -70,6 +70,17 @@ namespace Bootstrap.Infrastructures.Extensions
             return url;
         }
 
+        public static string GetFilename(this string url)
+        {
+            var filename = url.Substring(url.LastIndexOf('/') + 1);
+            if (filename.Contains('?'))
+            {
+                filename = filename.Substring(0, filename.IndexOf('?'));
+            }
+
+            return filename;
+        }
+
         public static int GetLevenshteinDistance(this string a, string b)
         {
             if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
