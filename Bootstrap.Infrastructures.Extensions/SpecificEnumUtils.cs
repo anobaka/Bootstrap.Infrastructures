@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Bootstrap.Infrastructures.Extensions
 {
-    public static class SpecificEnumUtils<TEnum> where TEnum : struct
+    public static class SpecificEnumUtils<TEnum> where TEnum : Enum
     {
         public static List<TEnum> Values = Enum.GetValues(SpecificTypeUtils<TEnum>.Type).Cast<TEnum>().ToList();
 
@@ -18,7 +18,7 @@ namespace Bootstrap.Infrastructures.Extensions
         {
             return DisplayNames.GetOrAdd(value, t =>
             {
-                var type = value.GetType();
+                var type = SpecificTypeUtils<TEnum>.Type;
                 var name = Enum.GetName(type, value);
                 if (name != null)
                 {

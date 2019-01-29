@@ -9,12 +9,9 @@ namespace Bootstrap.Infrastructures.Extensions
 {
     public static class EnumExtensions
     {
-        public static bool IsDefined<T>(this T e) where T : struct
+        public static bool IsDefined<T>(this T e) where T : Enum
         {
-            var type = typeof(T);
-            if (type.IsEnum)
-                return Enum.GetValues(type).Cast<T>().Contains(e);
-            return true;
+            return SpecificEnumUtils<T>.Values.Contains(e);
         }
     }
 }
