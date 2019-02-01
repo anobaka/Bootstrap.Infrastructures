@@ -45,6 +45,42 @@ namespace Bootstrap.Infrastructures.Extensions
                 @"(^127\.)|(^10\.) |(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)|(^::1)");
         }
 
+        /// <summary>
+        /// Support http(s) url only for now.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        public static string AddSchemaSafely(this string url, string schema = "https")
+        {
+            if (!string.IsNullOrEmpty(url))
+            {
+                if (!url.StartsWith("https:") && !url.StartsWith("http:"))
+                {
+                    var prefix = schema + ":";
+                    if (!url.StartsWith("//"))
+                    {
+                        prefix += "//";
+                    }
+
+                    return prefix + url;
+                }
+            }
+
+            return url;
+        }
+
+        public static string GetFilename(this string url)
+        {
+            var filename = url.Substring(url.LastIndexOf('/') + 1);
+            if (filename.Contains('?'))
+            {
+                filename = filename.Substring(0, filename.IndexOf('?'));
+            }
+
+            return filename;
+        }
+
         public static int GetLevenshteinDistance(this string a, string b)
         {
             if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
