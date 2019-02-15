@@ -1,24 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Bootstrap.Infrastructures.Extensions.Swagger
 {
+    /// <summary>
+    /// Describe the names and values of an enum type.
+    /// todo: don't know the new logic in swagger gen v5.0, this is a temporary fix.
+    /// </summary>
     public class EnumSchemaFilter : IDocumentFilter, ISchemaFilter, IOperationFilter
     {
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        private void _applyEnumSchemeRecursively(OpenApiSchema model, Type type)
         {
-        }
-
-        private void _applyEnumSchemeRecursively(Schema model)
-        {
-            if (model.Enum?.Any() == true)
+            if (type.IsEnum)
             {
-                var additionalDesc = _buildDescription(model.Enum);
+                var additionalDesc = _buildDescription(type);
                 if (model.Description?.Contains(additionalDesc) != true)
                 {
-                    model.Description += $"->{additionalDesc}";
+                    model.Description += $"{additionalDesc}";
                 }
             }
 
@@ -26,50 +29,70 @@ namespace Bootstrap.Infrastructures.Extensions.Swagger
             {
                 foreach (var p in model.Properties)
                 {
-                    _applyEnumSchemeRecursively(p.Value);
+                    var property = type.GetProperties()
+                        .FirstOrDefault(t => t.Name.Equals(p.Key, StringComparison.OrdinalIgnoreCase));
+                    _applyEnumSchemeRecursively(p.Value, property.PropertyType);
                 }
             }
         }
 
-        public void Apply(Schema model, SchemaFilterContext context)
-        {
-            _applyEnumSchemeRecursively(model);
-        }
-
-        private string _buildDescription(IList<object> enums)
+        private string _buildDescription(Type type)
         {
             string a = null;
-            if (enums != null)
+            foreach (var e in Enum.GetValues(type))
             {
-                foreach (var e in enums)
+                if (!string.IsNullOrEmpty(a))
                 {
-                    if (!string.IsNullOrEmpty(a))
-                    {
-                        a += ", ";
-                    }
-
-                    a += $"{(int) e}: {e}";
+                    a += ", ";
                 }
 
-                a = $"[{a}]";
+                a += $"{(int)e}: {e}";
             }
+
+            a = $"[{a}]";
 
             return a;
         }
 
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiSchema model, SchemaFilterContext context)
+        {
+            _applyEnumSchemeRecursively(model, context.SystemType);
+        }
+
+
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+        {
+        }
+
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (operation.Parameters?.Any() == true)
             {
                 foreach (var p in operation.Parameters)
                 {
-                    if (p is NonBodyParameter t)
+                    if (p.Schema.Enum.Count > 0)
                     {
-                        var s = _buildDescription(t.Enum);
-                        if (!string.IsNullOrEmpty(s) && t.Description?.Contains(s) != true)
+                        var enumType = context.ApiDescription.ParameterDescriptions.FirstOrDefault(t =>
+                            t.Name.Equals(p.Name, StringComparison.OrdinalIgnoreCase));
+                        if (enumType != null)
                         {
-                            t.Description += s;
+                            var type = enumType.Type;
+                            if (type.IsGenericType)
+                            {
+                                type = type.GenericTypeArguments.FirstOrDefault();
+                            }
+
+                            if (type?.IsEnum == true)
+                            {
+                                var additionalDesc = _buildDescription(type);
+                                if (p.Schema.Description?.Contains(additionalDesc) != true)
+                                {
+                                    p.Schema.Description += $"{additionalDesc}";
+                                }
+                            }
                         }
+
+                        p.Description += p.Schema.Description;
                     }
                 }
             }
