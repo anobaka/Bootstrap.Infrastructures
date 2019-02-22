@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
@@ -29,9 +30,15 @@ namespace Bootstrap.Infrastructures.Extensions.Swagger
             {
                 foreach (var p in model.Properties)
                 {
-                    var property = type.GetProperties()
-                        .FirstOrDefault(t => t.Name.Equals(p.Key, StringComparison.OrdinalIgnoreCase));
-                    _applyEnumSchemeRecursively(p.Value, property.PropertyType);
+                    var propertyType =
+                        type.GetProperties()
+                            .FirstOrDefault(t => t.Name.Equals(p.Key, StringComparison.OrdinalIgnoreCase))
+                            ?.PropertyType ?? type.GetFields()
+                            .FirstOrDefault(t => t.Name.Equals(p.Key, StringComparison.OrdinalIgnoreCase))?.FieldType;
+                    if (propertyType != null)
+                    {
+                        _applyEnumSchemeRecursively(p.Value, propertyType);
+                    }
                 }
             }
         }
