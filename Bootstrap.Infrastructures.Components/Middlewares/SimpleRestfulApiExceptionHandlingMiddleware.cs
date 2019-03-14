@@ -12,7 +12,7 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Bootstrap.Infrastructures.Components.Middleware
+namespace Bootstrap.Infrastructures.Components.Middlewares
 {
     public class SimpleRestfulApiExceptionHandlingMiddleware
     {

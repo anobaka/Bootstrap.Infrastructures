@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Bootstrap.Infrastructures.Components.Middleware
+namespace Bootstrap.Infrastructures.Components.Middlewares
 {
     public class ElapsedTimeMiddleware
     {

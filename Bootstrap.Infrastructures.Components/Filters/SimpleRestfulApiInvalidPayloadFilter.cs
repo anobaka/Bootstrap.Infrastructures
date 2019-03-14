@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
-using Bootstrap.Infrastructures.Components.Middleware;
+using Bootstrap.Infrastructures.Components.Middlewares;
 using Bootstrap.Infrastructures.Models.Exceptions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
