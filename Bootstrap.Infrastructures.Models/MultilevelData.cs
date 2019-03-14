@@ -19,7 +19,7 @@ namespace Bootstrap.Infrastructures.Models
         public virtual int Right { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public virtual DateTime CreateDt { get; set; }
+        public virtual DateTime CreateDt { get; set; } = DateTime.Now;
 
         public virtual bool IsLeaf => Right - Left <= 1;
     }
