@@ -124,8 +124,8 @@ namespace Bootstrap.Infrastructures.Extensions
         public Func<HttpRequest, bool> LogRequestBody { get; set; } =
             req =>
             {
-                var ct = req.ContentType.ToLower();
-                return ct.Contains("json") || ct.Contains("xml");
+                var ct = req.ContentType?.ToLower();
+                return string.IsNullOrEmpty(ct) || ct.Contains("json") || ct.Contains("xml");
             };
 
         public Func<HttpResponse, bool> LogResponseBody { get; set; } =
