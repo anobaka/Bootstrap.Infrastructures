@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace Bootstrap.Infrastructures.Extensions
@@ -21,10 +22,13 @@ namespace Bootstrap.Infrastructures.Extensions
         private readonly EventId _eventId = new EventId(0, nameof(SimpleRequestLoggingMiddleware));
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
+        private readonly IOptions<SimpleRequestLoggingOptions> _options;
 
-        public SimpleRequestLoggingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public SimpleRequestLoggingMiddleware(RequestDelegate next, ILoggerFactory loggerFactory,
+            IOptions<SimpleRequestLoggingOptions> options)
         {
             _next = next;
+            _options = options;
             _logger = loggerFactory.CreateLogger<InternalAuthenticationMiddleware>();
         }
 
@@ -33,9 +37,12 @@ namespace Bootstrap.Infrastructures.Extensions
             using (var reqBody = new MemoryStream())
             {
                 var originalReqBody = context.Request.Body;
-                await originalReqBody.CopyToAsync(reqBody);
-                reqBody.Seek(0, SeekOrigin.Begin);
-                context.Request.Body = reqBody;
+                if (_options.Value.LogRequestBody(context.Request))
+                {
+                    await originalReqBody.CopyToAsync(reqBody);
+                    reqBody.Seek(0, SeekOrigin.Begin);
+                    context.Request.Body = reqBody;
+                }
 
                 using (var resBody = new MemoryStream())
                 {
@@ -45,18 +52,35 @@ namespace Bootstrap.Infrastructures.Extensions
                     await _next(context);
 
                     // logging
-                    reqBody.Seek(0, SeekOrigin.Begin);
-                    resBody.Seek(0, SeekOrigin.Begin);
-                    string reqString, resString;
-                    using (var reqSteamReader = new StreamReader(reqBody))
+                    string reqString;
+                    if (_options.Value.LogRequestBody(context.Request))
                     {
-                        reqString = await reqSteamReader.ReadToEndAsync();
-                        context.Request.Body = originalReqBody;
+                        reqBody.Seek(0, SeekOrigin.Begin);
+
+                        using (var reqSteamReader = new StreamReader(reqBody))
+                        {
+                            reqString = await reqSteamReader.ReadToEndAsync();
+                            context.Request.Body = originalReqBody;
+                        }
+                    }
+                    else
+                    {
+                        reqString = $"{context.Request.ContentLength} bytes are ignored";
                     }
 
+                    string resString;
+                    resBody.Seek(0, SeekOrigin.Begin);
                     using (var resStreamReader = new StreamReader(resBody))
                     {
-                        resString = await resStreamReader.ReadToEndAsync();
+                        if (_options.Value.LogResponseBody(context.Response))
+                        {
+                            resString = await resStreamReader.ReadToEndAsync();
+                        }
+                        else
+                        {
+                            resString = $"{resBody.Length} bytes are ignored";
+                        }
+
                         resBody.Seek(0, SeekOrigin.Begin);
                         await resBody.CopyToAsync(originalResBody);
                         context.Response.Body = originalResBody;
@@ -72,7 +96,7 @@ namespace Bootstrap.Infrastructures.Extensions
                         $"url: {context.Request.GetDisplayUrl()}",
                         $"remote address: {context.Connection.RemoteIpAddress}:{context.Connection.RemotePort}",
                         $"method: {context.Request.Method}",
-                        $"headers: \n{string.Join("\n", context.Request.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
+                        $"headers: {(!context.Request.Headers.Any() ? null : $"{Environment.NewLine}{string.Join(Environment.NewLine, context.Request.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}")}",
                         $"body: {reqString}",
                         BuildDelimiter("session"),
                         $"authenticated: {isAuthenticated}",
@@ -80,10 +104,10 @@ namespace Bootstrap.Infrastructures.Extensions
                         $"claims: {(principal != null ? $"{{{string.Join(", ", principal.Claims.Select(t => $"{t.Type}: {t.Value}"))}}}" : null)}",
                         BuildDelimiter("response"),
                         $"status: {context.Response.StatusCode}",
-                        $"headers: \n{string.Join("\n", context.Response.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}",
+                        $"headers: {(!context.Response.Headers.Any() ? null : $"{Environment.NewLine}{string.Join(Environment.NewLine, context.Response.Headers.Select(t => $"\t{t.Key}: {t.Value}"))}")}",
                         $"body: {resString}"
                     };
-                    _logger.LogInformation(_eventId, $"\n{string.Join("\n", lines)}");
+                    _logger.LogInformation(_eventId, $"{string.Join(Environment.NewLine, lines)}");
                 }
             }
         }
@@ -93,5 +117,22 @@ namespace Bootstrap.Infrastructures.Extensions
             var leftLength = (50 - text.Length) / 2;
             return $"{text.PadLeft(leftLength + text.Length, '-').PadRight(50, '-')}";
         }
+    }
+
+    public class SimpleRequestLoggingOptions
+    {
+        public Func<HttpRequest, bool> LogRequestBody { get; set; } =
+            req =>
+            {
+                var ct = req.ContentType.ToLower();
+                return ct.Contains("json") || ct.Contains("xml");
+            };
+
+        public Func<HttpResponse, bool> LogResponseBody { get; set; } =
+            res =>
+            {
+                var ct = res.ContentType?.ToLower();
+                return string.IsNullOrEmpty(ct) || ct.Contains("json") || ct.Contains("xml");
+            };
     }
 }
