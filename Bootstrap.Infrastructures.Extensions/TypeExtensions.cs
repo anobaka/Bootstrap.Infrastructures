@@ -20,14 +20,14 @@ namespace Bootstrap.Infrastructures.Extensions
             return typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
 
-        public static TypeInfo GetTypeInfo(this Type type)
+        public static TypeInfo GetCachedTypeInfo(this Type type)
         {
             return Cache.GetOrAdd(type, t => t.GetTypeInfo());
         }
 
         public static bool IsTypeOfNullable(this Type type)
         {
-            return type.GetTypeInfo().IsTypeOfNullable();
+            return type.GetCachedTypeInfo().IsTypeOfNullable();
         }
 
         public static Type GetMostBaseClassOfNullableType(this Type type)
@@ -44,7 +44,7 @@ namespace Bootstrap.Infrastructures.Extensions
         public static bool IsSimple(this Type type)
         {
             var t = type.GetMostBaseClassOfNullableType();
-            var typeInfo = t.GetTypeInfo();
+            var typeInfo = t.GetCachedTypeInfo();
             return typeInfo.IsPrimitive || typeInfo.IsEnum || type == typeof(string) || type == typeof(decimal);
         }
 
