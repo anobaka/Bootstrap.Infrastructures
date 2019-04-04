@@ -1,4 +1,6 @@
-﻿using Bootstrap.Infrastructures.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Bootstrap.Infrastructures.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bootstrap.Infrastructures.Components.Extensions
@@ -30,6 +32,33 @@ namespace Bootstrap.Infrastructures.Components.Extensions
                     r.Property(a => a.CreateDt).HasColumnName("create_dt");
                 }
             });
+        }
+
+        public static void BuildTree<T>(this IEnumerable<MultilevelData<T>> list) where T : MultilevelData<T>
+        {
+            var dataCollection = list.ToList();
+            for (var i = 0; i < dataCollection.Count; i++)
+            {
+                var data = dataCollection[i];
+                if (i == 0)
+                {
+                    data.Left = data.Parent?.Left + 1 ?? 1;
+                }
+                else
+                {
+                    data.Left = dataCollection[i - 1].Right + 1;
+                }
+
+                if (data.Children?.Any() == true)
+                {
+                    data.Children.BuildTree();
+                    data.Right = data.Children.Max(t => t.Right) + 1;
+                }
+                else
+                {
+                    data.Right = data.Left + 1;
+                }
+            }
         }
     }
 }
