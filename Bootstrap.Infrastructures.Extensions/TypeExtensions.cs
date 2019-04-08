@@ -3,7 +3,10 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Microsoft.CSharp;
@@ -13,7 +16,10 @@ namespace Bootstrap.Infrastructures.Extensions
     public static class TypeExtensions
     {
         private static readonly ConcurrentDictionary<Type, TypeInfo> Cache = new ConcurrentDictionary<Type, TypeInfo>();
-        private static readonly CSharpCodeProvider _compiler = new CSharpCodeProvider();
+        private static readonly CSharpCodeProvider Compiler = new CSharpCodeProvider();
+
+        private static readonly ConcurrentDictionary<Type, PropertyInfo> IdProperties =
+            new ConcurrentDictionary<Type, PropertyInfo>();
 
         public static bool IsTypeOfNullable(this TypeInfo typeInfo)
         {
@@ -58,7 +64,7 @@ namespace Bootstrap.Infrastructures.Extensions
             }
 
             var newType = new CodeTypeReference(t);
-            return _compiler.GetTypeOutput(newType);
+            return Compiler.GetTypeOutput(newType);
         }
 
         public static string GetCSharpRepresentation(this Type t, List<Type> availableArguments)
@@ -98,6 +104,27 @@ namespace Bootstrap.Infrastructures.Extensions
             }
 
             return t.Name;
+        }
+
+        public static PropertyInfo GetKeyProperty(this Type type,
+            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance)
+        {
+            return IdProperties.GetOrAdd(type, t1 =>
+            {
+                var properties = t1.GetProperties(bindingFlags)
+                    .Where(t => t.GetCustomAttribute<NotMappedAttribute>() == null).ToList();
+                foreach (var p in properties)
+                {
+                    if (p.GetCustomAttribute<KeyAttribute>() != null)
+                    {
+                        return p;
+                    }
+                }
+
+                var possibleKeyNames = new[] {"Id", $"{t1.Name}Id"};
+                return possibleKeyNames.Select(p => properties.FirstOrDefault(t => t.Name.Equals(p)))
+                    .FirstOrDefault(key => key != null);
+            });
         }
     }
 }
