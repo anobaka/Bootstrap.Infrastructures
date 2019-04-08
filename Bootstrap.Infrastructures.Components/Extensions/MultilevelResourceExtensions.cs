@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bootstrap.Infrastructures.Components.Extensions
 {
-    public static class MultilevelDataExtensions
+    public static class MultilevelResourceExtensions
     {
         public enum DbType
         {
@@ -13,8 +13,15 @@ namespace Bootstrap.Infrastructures.Components.Extensions
             Mysql = 2
         }
 
-        public static ModelBuilder ConfigureMultilevelDataPart<TData>(this ModelBuilder modelBuilder,
-            DbType dbType = DbType.SqlServer) where TData : MultilevelData<TData>
+        /// <summary>
+        /// todo: refactor
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="modelBuilder"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        public static ModelBuilder ConfigureMultilevelResourcePart<TData>(this ModelBuilder modelBuilder,
+            DbType dbType = DbType.SqlServer) where TData : MultilevelResource<TData>
         {
             return modelBuilder.Entity<TData>(r =>
             {
@@ -34,7 +41,7 @@ namespace Bootstrap.Infrastructures.Components.Extensions
             });
         }
 
-        public static void BuildTree<T>(this IEnumerable<MultilevelData<T>> list) where T : MultilevelData<T>
+        public static void BuildTree<T>(this IEnumerable<MultilevelResource<T>> list) where T : MultilevelResource<T>
         {
             var dataCollection = list.ToList();
             for (var i = 0; i < dataCollection.Count; i++)
