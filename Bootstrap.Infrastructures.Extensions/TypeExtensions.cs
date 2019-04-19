@@ -54,20 +54,30 @@ namespace Bootstrap.Infrastructures.Extensions
             return typeInfo.IsPrimitive || typeInfo.IsEnum || type == typeof(string) || type == typeof(decimal);
         }
 
-        public static string GetCSharpRepresentation(this Type t)
+        public static string GetCSharpRepresentation(this Type t, bool simpleName = true)
         {
             if (t.IsGenericType)
             {
                 var genericArgs = t.GetGenericArguments().ToList();
 
-                return GetCSharpRepresentation(t, genericArgs);
+                return GetCSharpRepresentation(t, genericArgs, simpleName);
             }
 
             var newType = new CodeTypeReference(t);
-            return Compiler.GetTypeOutput(newType);
+            var typeName = Compiler.GetTypeOutput(newType);
+            if (simpleName)
+            {
+                var dotIndex = typeName.LastIndexOf('.');
+                if (dotIndex > -1)
+                {
+                    typeName = typeName.Remove(0, dotIndex + 1);
+                }
+            }
+
+            return typeName;
         }
 
-        public static string GetCSharpRepresentation(this Type t, List<Type> availableArguments)
+        public static string GetCSharpRepresentation(this Type t, List<Type> availableArguments, bool simpleName = true)
         {
             if (t.IsGenericType)
             {
@@ -80,7 +90,7 @@ namespace Bootstrap.Infrastructures.Extensions
                 if (t.DeclaringType != null)
                 {
                     // This is a nested type, build the nesting type first
-                    value = GetCSharpRepresentation(t.DeclaringType, availableArguments) + "+" + value;
+                    value = GetCSharpRepresentation(t.DeclaringType, availableArguments, simpleName) + "+" + value;
                 }
 
                 // Build the type arguments (if any)
@@ -90,7 +100,7 @@ namespace Bootstrap.Infrastructures.Extensions
                 {
                     if (i != 0) argString += ", ";
 
-                    argString += availableArguments[0].GetCSharpRepresentation();
+                    argString += availableArguments[0].GetCSharpRepresentation(simpleName);
                     availableArguments.RemoveAt(0);
                 }
 
@@ -125,6 +135,20 @@ namespace Bootstrap.Infrastructures.Extensions
                 return possibleKeyNames.Select(p => properties.FirstOrDefault(t => t.Name.Equals(p)))
                     .FirstOrDefault(key => key != null);
             });
+        }
+
+        public static bool IsSubclassOfRawGeneric(this Type type, Type generic)
+        {
+            while (type != null && type != typeof(object))
+            {
+                var cur = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
+                if (generic == cur)
+                {
+                    return true;
+                }
+                type = type.BaseType;
+            }
+            return false;
         }
     }
 }
