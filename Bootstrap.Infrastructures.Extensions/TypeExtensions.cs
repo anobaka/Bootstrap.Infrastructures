@@ -81,8 +81,9 @@ namespace Bootstrap.Infrastructures.Extensions
         {
             if (t.IsGenericType)
             {
+                var isTypeOfNullable = t.IsTypeOfNullable();
                 var value = t.Name;
-                if (value.IndexOf("`") > -1)
+                if (!isTypeOfNullable && value.IndexOf("`") > -1)
                 {
                     value = value.Substring(0, value.IndexOf("`"));
                 }
@@ -107,7 +108,14 @@ namespace Bootstrap.Infrastructures.Extensions
                 // If there are type arguments, add them with < >
                 if (argString.Length > 0)
                 {
-                    value += "<" + argString + ">";
+                    if (isTypeOfNullable)
+                    {
+                        value = argString + "?";
+                    }
+                    else
+                    {
+                        value += "<" + argString + ">";
+                    }
                 }
 
                 return value;
