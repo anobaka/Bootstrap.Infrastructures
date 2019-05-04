@@ -63,7 +63,7 @@ namespace Bootstrap.Infrastructures.Extensions.Swagger
 
         public void Apply(OpenApiSchema model, SchemaFilterContext context)
         {
-            _applyEnumSchemeRecursively(model, context.SystemType);
+            _applyEnumSchemeRecursively(model, context.Type);
         }
 
 
