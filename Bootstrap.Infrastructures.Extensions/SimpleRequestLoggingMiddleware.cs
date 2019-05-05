@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -34,6 +35,9 @@ namespace Bootstrap.Infrastructures.Extensions
 
         public async Task Invoke(HttpContext context)
         {
+            var startDt = DateTime.Now;
+            var sw = new Stopwatch();
+            sw.Start();
             using (var reqBody = new MemoryStream())
             {
                 var originalReqBody = context.Request.Body;
@@ -90,9 +94,12 @@ namespace Bootstrap.Infrastructures.Extensions
                     // may be null
                     var principal = authentication.Principal;
                     var isAuthenticated = principal?.Identity.IsAuthenticated == true;
+                    sw.Stop();
                     var lines = new List<string>
                     {
                         BuildDelimiter("request"),
+                        $"received at: {startDt:yyyy-MM-dd HH:mm:ss.fff}",
+                        $"elapsed: {sw.ElapsedMilliseconds}ms",
                         $"url: {context.Request.GetDisplayUrl()}",
                         $"remote address: {context.Connection.RemoteIpAddress}:{context.Connection.RemotePort}",
                         $"method: {context.Request.Method}",
