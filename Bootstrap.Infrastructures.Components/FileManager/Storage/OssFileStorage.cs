@@ -2,27 +2,26 @@
 using System.IO;
 using System.Threading.Tasks;
 using Aliyun.OSS;
-using Bootstrap.Infrastructures.Components.FileUploader;
 using Bootstrap.Infrastructures.Models.ResponseModels;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Bootstrap.Infrastructures.Components.FileManager
+namespace Bootstrap.Infrastructures.Components.FileManager.Storage
 {
     public class OssFileStorage : IFileStorage
     {
         private readonly OssClient _client;
-        private readonly IOptions<OssClientFileStorageOptions> _options;
+        private readonly IOptions<OssFileStorageOptions> _options;
         private readonly ILogger<OssFileStorage> _logger;
 
-        public OssFileStorage(IOptions<OssClientFileStorageOptions> options, ILogger<OssFileStorage> logger)
+        public OssFileStorage(IOptions<OssFileStorageOptions> options, ILogger<OssFileStorage> logger)
         {
             _options = options;
             _logger = logger;
             _client = new OssClient(options.Value.Endpoint, options.Value.AccessKeyId, options.Value.AccessKeySecret);
         }
 
-        public Task<SingletonResponse<string>> Upload(string relativeFilename, Stream file)
+        public Task<SingletonResponse<string>> Save(string relativeFilename, Stream file)
         {
             return Task.Run(() =>
             {

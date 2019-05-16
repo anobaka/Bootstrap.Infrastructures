@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bootstrap.Infrastructures.Components.FileUploader
+﻿namespace Bootstrap.Infrastructures.Components.FileManager.Storage
 {
-    public class OssClientFileStorageOptions
+    public class OssFileStorageOptions
     {
         public string Endpoint { get; set; }
         public string AccessKeyId { get; set; }

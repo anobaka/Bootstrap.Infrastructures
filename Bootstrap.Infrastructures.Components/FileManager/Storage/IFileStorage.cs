@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Bootstrap.Infrastructures.Models.ResponseModels;
 
-namespace Bootstrap.Infrastructures.Components.FileUploader
+namespace Bootstrap.Infrastructures.Components.FileManager.Storage
 {
     public interface IFileStorage
     {
@@ -12,6 +12,6 @@ namespace Bootstrap.Infrastructures.Components.FileUploader
         /// <param name="relativeFilename"></param>
         /// <param name="file"></param>
         /// <returns>Full file address</returns>
-        Task<SingletonResponse<string>> Upload(string relativeFilename, Stream file);
+        Task<SingletonResponse<string>> Save(string relativeFilename, Stream file);
     }
 }

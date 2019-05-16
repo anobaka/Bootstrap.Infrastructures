@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
-namespace Bootstrap.Infrastructures.Extensions.Upload
+namespace Bootstrap.Infrastructures.Components.FileManager
 {
-    public static class UploadExtensions
+    public static class FileManagerExtensions
     {
         private static readonly ConcurrentDictionary<object, string> Directories =
             new ConcurrentDictionary<object, string>();
@@ -15,7 +13,7 @@ namespace Bootstrap.Infrastructures.Extensions.Upload
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="type">Business layer file type with <see cref="UploadDirectoryAttribute"/>.</param>
+        /// <param name="type">Business layer file type with <see cref="DirectoryAttribute"/>.</param>
         /// <param name="filename"></param>
         /// <returns></returns>
         public static string BuildFilename<T>(this T type, string filename)
@@ -30,7 +28,7 @@ namespace Bootstrap.Infrastructures.Extensions.Upload
                     if (field != null)
                     {
                         if (Attribute.GetCustomAttribute(field,
-                            typeof(UploadDirectoryAttribute)) is UploadDirectoryAttribute attr)
+                            typeof(DirectoryAttribute)) is DirectoryAttribute attr)
                         {
                             return attr.Directory;
                         }
