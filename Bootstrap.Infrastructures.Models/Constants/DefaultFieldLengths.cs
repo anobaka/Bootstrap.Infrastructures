@@ -22,9 +22,9 @@ namespace Bootstrap.Infrastructures.Models.Constants
         public const int MaxMobile = 32;
         public const int MaxTag = 32;
         public const int MaxEmail = 254;
-        public const int MaxWeChatOpenId = 64;
-        public const int MaxWeChatUnionId = 64;
-        public const int MaxWeChatTemplateMessageId = 32;
+        public const int MaxWeixinOpenId = 64;
+        public const int MaxWeixinUnionId = 64;
+        public const int MaxWeixinTemplateMessageId = 32;
         public const int MaxCaptcha = 6;
         public const int MaxDetailAddress = 256;
     }
