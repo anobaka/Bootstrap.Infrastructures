@@ -27,5 +27,9 @@ namespace Bootstrap.Infrastructures.Models.Constants
         public const int MaxWeixinTemplateMessageId = 32;
         public const int MaxCaptcha = 6;
         public const int MaxDetailAddress = 256;
+        /// <summary>
+        /// Text version for price.
+        /// </summary>
+        public const int PriceText = 32;
     }
 }

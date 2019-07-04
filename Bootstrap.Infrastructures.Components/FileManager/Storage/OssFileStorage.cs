@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Aliyun.OSS;
 using Bootstrap.Infrastructures.Models.ResponseModels;
@@ -28,7 +30,8 @@ namespace Bootstrap.Infrastructures.Components.FileManager.Storage
                 try
                 {
                     _client.PutObject(_options.Value.BucketName, relativeFilename, file);
-                    return new SingletonResponse<string>($"{_options.Value.Domain}/{relativeFilename}");
+                    return new SingletonResponse<string>(
+                        $"{_options.Value.Domain}/{string.Join("/", relativeFilename.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Select(WebUtility.UrlEncode))}");
                 }
                 catch (Exception ex)
                 {
