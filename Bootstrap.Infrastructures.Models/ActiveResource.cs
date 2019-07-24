@@ -6,6 +6,6 @@ namespace Bootstrap.Infrastructures.Models
 {
     public class ActiveResource
     {
-        public bool Active { get; set; }
+        public bool Active { get; set; } = true;
     }
 }
