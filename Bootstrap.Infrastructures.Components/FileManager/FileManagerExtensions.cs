@@ -38,7 +38,7 @@ namespace Bootstrap.Infrastructures.Components.FileManager
                 return type.ToString();
             });
             return
-                $"{dir}/{Path.GetFileNameWithoutExtension(filename)}-{DateTime.Now:yyyyMMddHHmmssfff}-{Guid.NewGuid().ToString()}-{Path.GetExtension(filename)}"
+                $"{dir}/{Path.GetFileNameWithoutExtension(filename)}-{DateTime.Now:yyyyMMddHHmmssfff}-{Guid.NewGuid().ToString()}{Path.GetExtension(filename)}"
                     .Replace("//", "/");
         }
     }

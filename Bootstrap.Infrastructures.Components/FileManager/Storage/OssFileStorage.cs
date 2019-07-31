@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -29,6 +30,7 @@ namespace Bootstrap.Infrastructures.Components.FileManager.Storage
             {
                 try
                 {
+                    relativeFilename = (_options.Value.RootPath + "/" + relativeFilename).Trim('/');
                     _client.PutObject(_options.Value.BucketName, relativeFilename, file);
                     return new SingletonResponse<string>(
                         $"{_options.Value.Domain}/{string.Join("/", relativeFilename.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Select(WebUtility.UrlEncode))}");

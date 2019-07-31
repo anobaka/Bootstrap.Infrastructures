@@ -7,5 +7,6 @@
         public string AccessKeySecret { get; set; }
         public string BucketName { get; set; }
         public string Domain { get; set; }
+        public string RootPath { get; set; }
     }
 }
