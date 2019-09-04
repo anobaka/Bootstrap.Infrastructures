@@ -16,9 +16,13 @@ namespace Bootstrap.Infrastructures.Components.Filters
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (context.ModelState.IsValid || await HandleModelStateErrors(context, context.ModelState))
+            if (context.ModelState.IsValid)
             {
                 await next();
+            }
+            else
+            {
+                await HandleModelStateErrors(context, context.ModelState);
             }
         }
 
