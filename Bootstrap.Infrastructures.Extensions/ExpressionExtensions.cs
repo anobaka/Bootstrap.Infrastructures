@@ -60,8 +60,7 @@ namespace Bootstrap.Infrastructures.Extensions
         }
 
         public static Expression<Func<TResource, TKey>> BuildKeySelector<TResource, TKey>() =>
-            BuildKeyExpression<TResource, TKey>(null,
-                (t, key, value) => Expression.TypeAs(key, SpecificTypeUtils<TKey>.Type));
+            BuildKeyExpression<TResource, TKey>(null, (t, key, value) => key);
 
         public static Expression<Func<TResource, object>> BuildKeySelector<TResource>() =>
             BuildKeySelector<TResource, object>();
